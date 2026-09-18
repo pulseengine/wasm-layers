@@ -22,10 +22,16 @@
 # bytes, from those exact releases, in one signed manifest — never the software.
 
 [varve]
-# The varve release whose binary AND assembler build this layer. v0.37.0 or
-# later: earlier assemblers cannot read `[[include]]`, which the `covalent`
-# realm needs to compose this layer with `pulseengine`.
-version = "v0.36.0"
+# The varve release whose binary AND assembler build this layer.
+#
+# v0.37.0, not v0.36.0, and this realm is why: v0.36.0's assembler read a
+# realm's `unverified-reason` in `plan` and ignored it in `deposit`, which read
+# only the UNVERIFIED_INGEST environment variable. The three opt-ins below were
+# therefore parsed, displayed, and refused — this realm's first deposit failed
+# twice on it. v0.37.0 makes a stated reason an opt-in wherever it decides
+# something (varve#170), and is also the first release whose `layer.toml` can
+# declare a `[[include]]` at all, which `covalent` needs to compose this layer.
+version = "v0.37.0"
 
 [realm]
 name    = "pulseengine-wasm"
