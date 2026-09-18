@@ -53,3 +53,25 @@ def tracks_tag(entry: dict) -> bool:
     if release is None:
         return True
     return entry["version"].lstrip("v") == release.lstrip("v")
+
+
+def registry_ref(manifest: dict) -> str:
+    """The registry this realm publishes to, as `host/repo` (no scheme).
+
+    Read from the manifest, never defaulted in code. `next-layer-id.sh` used to
+    default to `ghcr.io/pulseengine/layers`, which is correct in exactly one
+    repository and silently wrong in every other — copied into a second realm it
+    derived that realm's next layer id and COUNTER from another realm's
+    published record. The counter is the per-line anti-rollback high-water mark,
+    so a first layer would have claimed a history it does not have.
+    """
+    registry = manifest["realm"]["registry"]
+    if not registry.startswith("oci://"):
+        raise ValueError(
+            f"realm.registry is {registry!r}; varve addresses a realm's registry as "
+            f"oci://<host>/<repo>, and everything downstream strips that scheme"
+        )
+    ref = registry.removeprefix("oci://").rstrip("/")
+    if "/" not in ref:
+        raise ValueError(f"realm.registry {registry!r} names a host with no repository path")
+    return ref

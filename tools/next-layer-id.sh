@@ -28,7 +28,7 @@
 # depends on it now: nobody types a layer id here any more, so the derivation
 # has to be right without a person to notice it is not.
 #
-# Usage:  tools/next-layer-id.sh [registry-ref]
+# Usage:  tools/next-layer-id.sh [registry-ref]   (default: layer.toml's realm.registry)
 # Prints: "<layer>\t<counter>"  (and a human-readable trace on stderr)
 #
 # Reads the registry anonymously — layer publication is public and the whole
@@ -38,7 +38,22 @@
 
 set -euo pipefail
 
-REF="${1:-${VARVE_REGISTRY_REF:-ghcr.io/pulseengine/layers}}"
+# The registry comes from layer.toml — the one place this realm is defined.
+# It used to default to a literal `ghcr.io/pulseengine/layers`, which is right
+# in exactly one repository: copied into a second realm, this script read the
+# FIRST realm's published record and proposed its next layer id and counter.
+# The counter is the per-line anti-rollback high-water mark, so that would have
+# signed a history this realm does not have.
+default_ref() {
+  python3 -c "
+import sys, tomllib
+sys.path.insert(0, 'tools')
+from pins import registry_ref
+with open('layer.toml', 'rb') as f:
+    print(registry_ref(tomllib.load(f)))
+"
+}
+REF="${1:-${VARVE_REGISTRY_REF:-$(default_ref)}}"
 HOST="${REF%%/*}"
 REPO="${REF#*/}"
 LINE="${VARVE_LAYER_LINE:-$(date -u +%Y.%m)}"
@@ -57,9 +72,35 @@ else
 fi
 AUTH="Authorization: Bearer $TOKEN"
 
-TAGS="$(curl -fsS -H "$AUTH" "https://$HOST/v2/$REPO/tags/list" \
-        | python3 -c 'import json,sys; print("\n".join(json.load(sys.stdin).get("tags") or []))' 2>/dev/null)" \
-  || die "could not list tags of $REF — refusing to guess a layer id"
+# A realm's FIRST layer has no registry repository to list: ghcr answers 404
+# with NAME_UNKNOWN, which is not "I could not ask" — it is "nothing has been
+# published here yet", and refusing it would mean a new realm could never
+# receive its first layer. Any other failure is still a refusal: a typo in the
+# registry, a token without pull rights and an outage all look like an empty
+# realm otherwise, and the answer would be layer .0 counter 1 on top of a line
+# that already exists.
+BODY="$(curl -sS -H "$AUTH" -w '\n%{http_code}' "https://$HOST/v2/$REPO/tags/list" 2>/dev/null)" \
+  || die "could not reach $HOST to list tags of $REF — refusing to guess a layer id"
+CODE="${BODY##*$'\n'}"
+BODY="${BODY%$'\n'*}"
+case "$CODE" in
+  200)
+    TAGS="$(printf '%s' "$BODY" \
+            | python3 -c 'import json,sys; print("\n".join(json.load(sys.stdin).get("tags") or []))' 2>/dev/null)" \
+      || die "$REF answered 200 with something that is not a tag list — refusing to guess"
+    ;;
+  404)
+    printf '%s' "$BODY" | grep -q 'NAME_UNKNOWN' \
+      || die "$REF answered 404 without NAME_UNKNOWN — that is not an empty realm, it is a \
+registry that cannot answer for this repository; refusing to guess a layer id"
+    note "$REF holds no repository yet — this realm's first layer"
+    TAGS=""
+    ;;
+  *)
+    die "$REF answered HTTP $CODE listing tags — 'I could not ask' is not 'nothing is \
+published'; refusing to guess a layer id"
+    ;;
+esac
 note "$(printf '%s\n' "$TAGS" | grep -c . || true) tag(s) published on $REF"
 
 # ── the highest layer already on this line ───────────────────────────────────
