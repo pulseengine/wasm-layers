@@ -38,10 +38,13 @@ concurrency:
   cancel-in-progress: false
 
 on:
-  schedule:
-    # Every 15 minutes, offset off the quarter hour: on-the-quarter crons queue
-    # behind everyone else's.
-    - cron: "7,22,37,52 * * * *"
+  # DISPATCH ONLY, unlike pulseengine-layers, which runs this on a 15-minute
+  # cron. That realm's maintainer took that decision for its rolling channel
+  # with the cost written down (its DD-030: nobody decides whether a particular
+  # upstream release belongs in the toolchain, and varve has no revocation).
+  # This realm has no such decision recorded yet, and inheriting one by copying
+  # a file is not how it should be taken — so the scan runs when a person asks
+  # for it, and the schedule is added deliberately or not at all.
   workflow_dispatch:
 
 permissions:
