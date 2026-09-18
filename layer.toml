@@ -9,9 +9,17 @@
 # not `bytecodealliance` — a realm name is a claim about who vouches, and
 # naming it after the upstream would imply an endorsement nobody gave.
 #
-# Every payload is still verified against ITS OWN repository's cosign identity
-# before a byte is staged; what PulseEngine vouches for is the assembly, not
-# the software.
+# WHAT IS PROVEN, AND WHAT IS NOT — measured 2026-09-18, stated here because a
+# reader deserves it before reading the entries. Of the four upstreams, only
+# `wasm-tools` publishes anything that vouches for its bytes (GitHub build
+# provenance, which verifies). `wac`, `wkg` and `wrpc` publish neither
+# cosign-signed sums nor provenance, so they are ingested with a REASON signed
+# into the layer and are reported by `varve inspect` as proof = unverified.
+#
+# varve refused to deposit them until that reason was written, which is the
+# behaviour to notice: nothing here is signed as though it were vouched for
+# when it is not. What PulseEngine vouches for is the assembly — these exact
+# bytes, from those exact releases, in one signed manifest — never the software.
 
 [varve]
 # The varve release whose binary AND assembler build this layer. v0.37.0 or
@@ -42,12 +50,29 @@ asset   = "wasm-tools-%V-%U.tar.gz"
 # A bare binary per platform, and the file is called `wac-cli` while the tool
 # a consumer runs is `wac`. Linux builds are MUSL, whose triple no template
 # derives from a gnu one, so the four names are stated rather than guessed.
+# MEASURED 2026-09-18, not assumed: this release publishes no cosign-signed
+# SHA256SUMS.txt and no GitHub build provenance — `gh attestation verify` on
+# wac-cli-x86_64-unknown-linux-musl answers 404. The same probe answers YES for
+# wasm-tools, so this is a fact about wac's pipeline, not about the probe.
+#
+# Ingested anyway, with the reason signed into the layer and shown by
+# `varve inspect` as proof = unverified. What this rests on: TLS to GitHub and
+# GitHub's own integrity, for a release tag that is immutable once cut and whose
+# digest this layer freezes. What it does NOT rest on: anyone's signature over
+# those bytes.
+#
+# WHAT REMOVES THE NEED: bytecodealliance adding attest-build-provenance to
+# wac's release workflow — one step, and the same step wasm-tools already has —
+# or this organisation forking wac and cutting its release through a signed
+# pipeline. Either is strictly better than this entry, and this entry should be
+# deleted the day one lands.
 [[tool]]
 name    = "wac"
 repo    = "bytecodealliance/wac"
 version = "v0.11.0"
 binary  = "wac"
 layout  = "raw-per-platform"
+unverified-reason = "bytecodealliance/wac v0.11.0 publishes neither cosign-signed sums nor build provenance (measured 2026-09-18; gh attestation verify returns 404 for its assets, while the identical probe verifies wasm-tools). Accepted for the rolling channel only: the tag is immutable, this layer freezes the digest, and the component-model toolchain is unusable without wac. Removed by upstream adding attest-build-provenance — one step, which wasm-tools already has — or by forking wac into pulseengine and releasing it through a signed pipeline."
 [tool.asset-for]
 "aarch64-apple-darwin"      = "wac-cli-aarch64-apple-darwin"
 "x86_64-apple-darwin"       = "wac-cli-x86_64-apple-darwin"
@@ -56,21 +81,25 @@ layout  = "raw-per-platform"
 
 # A bare binary per platform whose names ARE Rust triples, so `%T` derives all
 # four — the easy case, kept in the example so the hard ones stand out.
+# Same measurement, same answer: no signed sums, no build provenance.
 [[tool]]
 name    = "wkg"
 repo    = "bytecodealliance/wasm-pkg-tools"
 version = "v0.16.1"
 layout  = "raw-per-platform"
 asset   = "wkg-%T"
+unverified-reason = "bytecodealliance/wasm-pkg-tools v0.16.1 publishes neither cosign-signed sums nor build provenance (measured 2026-09-18). Accepted for the rolling channel only, on the same terms as wac: an immutable tag and a digest this layer freezes, with no signature over the bytes. Removed by upstream adding attest-build-provenance, or by forking into pulseengine."
 
 # The repository is `wrpc` and the binary it ships is `wit-bindgen-wrpc`; the
 # payload is deposited under the name a consumer dispatches. Linux is musl
 # here too.
+# Same measurement, same answer.
 [[tool]]
 name    = "wit-bindgen-wrpc"
 repo    = "bytecodealliance/wrpc"
 version = "v0.17.0"
 layout  = "raw-per-platform"
+unverified-reason = "bytecodealliance/wrpc v0.17.0 publishes neither cosign-signed sums nor build provenance (measured 2026-09-18). Accepted for the rolling channel only, on the same terms as wac: an immutable tag and a digest this layer freezes, with no signature over the bytes. Removed by upstream adding attest-build-provenance, or by forking into pulseengine."
 [tool.asset-for]
 "aarch64-apple-darwin"      = "wit-bindgen-wrpc-aarch64-apple-darwin"
 "x86_64-apple-darwin"       = "wit-bindgen-wrpc-x86_64-apple-darwin"
