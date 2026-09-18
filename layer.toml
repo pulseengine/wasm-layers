@@ -1,0 +1,78 @@
+# What the `pulseengine-wasm` realm carries.
+#
+# THIS FILE IS THE LAYER. Bumping a version here is the whole change — no
+# workflow edit, no varve commit (REQ-PEL-MANIFEST-001).
+#
+# WHOSE ROOT SIGNS THIS, stated plainly because the payloads are not ours: the
+# tools come from bytecodealliance releases, and the key that signs this layer
+# is held by PulseEngine. The realm is therefore named `pulseengine-wasm` and
+# not `bytecodealliance` — a realm name is a claim about who vouches, and
+# naming it after the upstream would imply an endorsement nobody gave.
+#
+# Every payload is still verified against ITS OWN repository's cosign identity
+# before a byte is staged; what PulseEngine vouches for is the assembly, not
+# the software.
+
+[varve]
+# The varve release whose binary AND assembler build this layer. v0.37.0 or
+# later: earlier assemblers cannot read `[[include]]`, which the `covalent`
+# realm needs to compose this layer with `pulseengine`.
+version = "v0.36.0"
+
+[realm]
+name    = "pulseengine-wasm"
+channel = "rolling"
+# The trust root is NOT here — it is the public half consumers already hold.
+# This repository holds the secret half as a secret, never as a file.
+registry = "oci://ghcr.io/pulseengine/wasm-layers"
+
+# ── the component-model toolchain ───────────────────────────────────────────
+# Four upstreams, four different naming conventions. That is the point of a
+# worked example: none of this is hypothetical, and a realm manifest has to
+# express it without patching anything.
+
+# A tarball per platform, named ARCH-OS in bytecodealliance's own style —
+# `%U` exists for exactly this (`aarch64-macos`, not `aarch64-apple-darwin`).
+[[tool]]
+name    = "wasm-tools"
+repo    = "bytecodealliance/wasm-tools"
+version = "v1.259.0"
+asset   = "wasm-tools-%V-%U.tar.gz"
+
+# A bare binary per platform, and the file is called `wac-cli` while the tool
+# a consumer runs is `wac`. Linux builds are MUSL, whose triple no template
+# derives from a gnu one, so the four names are stated rather than guessed.
+[[tool]]
+name    = "wac"
+repo    = "bytecodealliance/wac"
+version = "v0.11.0"
+binary  = "wac"
+layout  = "raw-per-platform"
+[tool.asset-for]
+"aarch64-apple-darwin"      = "wac-cli-aarch64-apple-darwin"
+"x86_64-apple-darwin"       = "wac-cli-x86_64-apple-darwin"
+"aarch64-unknown-linux-gnu" = "wac-cli-aarch64-unknown-linux-musl"
+"x86_64-unknown-linux-gnu"  = "wac-cli-x86_64-unknown-linux-musl"
+
+# A bare binary per platform whose names ARE Rust triples, so `%T` derives all
+# four — the easy case, kept in the example so the hard ones stand out.
+[[tool]]
+name    = "wkg"
+repo    = "bytecodealliance/wasm-pkg-tools"
+version = "v0.16.1"
+layout  = "raw-per-platform"
+asset   = "wkg-%T"
+
+# The repository is `wrpc` and the binary it ships is `wit-bindgen-wrpc`; the
+# payload is deposited under the name a consumer dispatches. Linux is musl
+# here too.
+[[tool]]
+name    = "wit-bindgen-wrpc"
+repo    = "bytecodealliance/wrpc"
+version = "v0.17.0"
+layout  = "raw-per-platform"
+[tool.asset-for]
+"aarch64-apple-darwin"      = "wit-bindgen-wrpc-aarch64-apple-darwin"
+"x86_64-apple-darwin"       = "wit-bindgen-wrpc-x86_64-apple-darwin"
+"aarch64-unknown-linux-gnu" = "wit-bindgen-wrpc-aarch64-unknown-linux-musl"
+"x86_64-unknown-linux-gnu"  = "wit-bindgen-wrpc-x86_64-unknown-linux-musl"
