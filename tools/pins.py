@@ -52,7 +52,22 @@ def tracks_tag(entry: dict) -> bool:
     release = entry.get("release")
     if release is None:
         return True
-    return entry["version"].lstrip("v") == release.lstrip("v")
+    version = entry["version"].lstrip("v")
+    if version == release.lstrip("v"):
+        return True
+    # A tag that merely DECORATES the version still yields it: binaryen
+    # releases `version_133` for version 133, so a scanner seeing
+    # `version_134` can derive 134 and bump on its own. What it cannot derive
+    # is a hub's number — `with-device` is 0.2.2 inside release v0.7.2, and no
+    # amount of string handling gets from one to the other.
+    #
+    # Required: the tag ENDS WITH the version, and what precedes it contains no
+    # digits. Without that second half, release `v1.2.10` would "derive"
+    # version `10`.
+    if release.endswith(version):
+        prefix = release[: -len(version)]
+        return not any(c.isdigit() for c in prefix)
+    return False
 
 
 def registry_ref(manifest: dict) -> str:
