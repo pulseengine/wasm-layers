@@ -120,3 +120,65 @@ unverified-reason = "bytecodealliance/wrpc v0.17.0 publishes neither cosign-sign
 "x86_64-apple-darwin"       = "wit-bindgen-wrpc-x86_64-apple-darwin"
 "aarch64-unknown-linux-gnu" = "wit-bindgen-wrpc-aarch64-unknown-linux-musl"
 "x86_64-unknown-linux-gnu"  = "wit-bindgen-wrpc-x86_64-unknown-linux-musl"
+
+# ── what rules_wasm_component needs and this realm did not carry ────────────
+#
+# Measured 2026-09-24 against pulseengine/rules_wasm_component's own pinned
+# checksum set (`checksums/tools/*.json`): of the 22 tools that ruleset
+# downloads, 12 were carried by no realm at all. Four of them are
+# component-model tools of exactly the shape this realm already holds, so they
+# belong here. The rest are a separate question — see the issue.
+
+# The canonical bindings generator. This realm carried `wit-bindgen-wrpc`,
+# which is wrpc's transport-specific generator and NOT a substitute: the tool
+# a component author reaches for first was missing entirely.
+[[tool]]
+name    = "wit-bindgen"
+repo    = "bytecodealliance/wit-bindgen"
+version = "v0.62.0"
+asset   = "wit-bindgen-%V-%U.tar.gz"
+
+# The runtime. `.tar.xz`, which the assembler picks by MAGIC rather than by
+# file name — and wasmtime is the archive that made that necessary.
+#
+# The asset carries the RELEASE tag (`v49.0.0`), not the bare version, so the
+# template uses %R. The `-c-api` variants publish under longer names and are
+# deliberately not matched.
+[[tool]]
+name    = "wasmtime"
+repo    = "bytecodealliance/wasmtime"
+version = "49.0.0"
+release = "v49.0.0"
+asset   = "wasmtime-%R-%U.tar.xz"
+
+# wasm-opt and friends. Upstream's version IS the tag's suffix (`version_133`
+# for version 133), which is why `release` and `version` differ here — the
+# signed manifest says what the payload IS, and the tag says what to fetch
+# (REQ-PAYLOADID-001).
+#
+# Apple silicon is `arm64-macos` and not `aarch64-macos`, the one platform
+# whose name %U cannot derive, so that single asset is named outright rather
+# than the whole set being hand-written.
+[[tool]]
+name    = "binaryen"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+[tool.asset-for]
+"aarch64-apple-darwin" = "binaryen-version_133-arm64-macos.tar.gz"
+
+# The wrpc runtime tool. Same repository as `wit-bindgen-wrpc` above and the
+# same raw-per-platform shape: bare binaries, MUSL on Linux, so the four names
+# are stated rather than guessed.
+[[tool]]
+name    = "wrpc-wasmtime"
+repo    = "bytecodealliance/wrpc"
+version = "v0.17.0"
+binary  = "wrpc-wasmtime"
+layout  = "raw-per-platform"
+[tool.asset-for]
+"aarch64-apple-darwin"      = "wrpc-wasmtime-aarch64-apple-darwin"
+"x86_64-apple-darwin"       = "wrpc-wasmtime-x86_64-apple-darwin"
+"aarch64-unknown-linux-gnu" = "wrpc-wasmtime-aarch64-unknown-linux-musl"
+"x86_64-unknown-linux-gnu"  = "wrpc-wasmtime-x86_64-unknown-linux-musl"
