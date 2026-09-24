@@ -24,6 +24,33 @@ spec.loader.exec_module(pins)
 ROOT = pathlib.Path(__file__).parent.parent
 
 
+class TagDecoratesTheVersion(unittest.TestCase):
+    """A tag that decorates the version is still derivable; a hub is not."""
+
+    def test_a_decorated_tag_still_tracks(self):
+        # binaryen: release `version_133` carries version 133, so a scanner
+        # that sees `version_134` can bump this on its own.
+        self.assertTrue(
+            pins.tracks_tag({"name": "binaryen", "version": "133",
+                             "release": "version_133"})
+        )
+
+    def test_a_hub_release_does_not_track(self):
+        # with-device is 0.2.2 inside release v0.7.2 — unrelated numbers.
+        self.assertFalse(
+            pins.tracks_tag({"name": "with-device", "version": "0.2.2",
+                             "release": "v0.7.2"})
+        )
+
+    def test_a_shared_suffix_is_not_a_derivation(self):
+        # The trap the digit check exists for: v1.2.10 must NOT be read as
+        # "version 10 decorated with v1.2.".
+        self.assertFalse(
+            pins.tracks_tag({"name": "trap", "version": "10",
+                             "release": "v1.2.10"})
+        )
+
+
 class RegistryRef(unittest.TestCase):
     def test_the_scheme_is_stripped(self):
         self.assertEqual(
