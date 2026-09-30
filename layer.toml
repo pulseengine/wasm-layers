@@ -147,8 +147,14 @@ asset   = "wit-bindgen-%V-%U.tar.gz"
 [[tool]]
 name    = "wasmtime"
 repo    = "bytecodealliance/wasmtime"
-version = "49.0.0"
-release = "v49.0.0"
+# 49.0.1, not 49.0.0: upstream 49.0.1 is a SECURITY release fixing
+# GHSA-m63x-6p34-q65x (fuel-spend dropped for callees of `call_ref`
+# and callees returning via exception throws) and GHSA-jqpg-j7w6-42pr
+# (fuel spend for dynamic record lifting). Published 2026-09-24 and
+# unnoticed here until 2026-09-30, because this realm scans only when
+# a person asks it to — see pulseengine/varve#216.
+version = "49.0.1"
+release = "v49.0.1"
 asset   = "wasmtime-%R-%U.tar.xz"
 
 # wasm-opt and friends. Upstream's version IS the tag's suffix (`version_133`
