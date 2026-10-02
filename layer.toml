@@ -59,7 +59,7 @@ registry = "oci://ghcr.io/pulseengine/wasm-layers"
 [[tool]]
 name    = "wasm-tools"
 repo    = "bytecodealliance/wasm-tools"
-version = "v1.259.0"
+version = "v1.260.0"
 asset   = "wasm-tools-%V-%U.tar.gz"
 
 # A bare binary per platform, and the file is called `wac-cli` while the tool
@@ -84,10 +84,10 @@ asset   = "wasm-tools-%V-%U.tar.gz"
 [[tool]]
 name    = "wac"
 repo    = "bytecodealliance/wac"
-version = "v0.11.0"
+version = "v0.12.0"
 binary  = "wac"
 layout  = "raw-per-platform"
-unverified-reason = "bytecodealliance/wac v0.11.0 publishes neither cosign-signed sums nor build provenance (measured 2026-09-18; gh attestation verify returns 404 for its assets, while the identical probe verifies wasm-tools). Accepted for the rolling channel only: the tag is immutable, this layer freezes the digest, and the component-model toolchain is unusable without wac. Removed by upstream adding attest-build-provenance — one step, which wasm-tools already has — or by forking wac into pulseengine and releasing it through a signed pipeline."
+unverified-reason = "bytecodealliance/wac v0.12.0 publishes neither cosign-signed sums nor build provenance (re-measured 2026-10-02: the release carries five bare binaries and no SHA256SUMS, .sig or .pem, and `gh attestation verify` returns 404 for its assets while the identical probe exits 0 for wasm-tools v1.260.0). Accepted for the rolling channel only: the tag is immutable, this layer freezes the digest, and the component-model toolchain is unusable without wac. Removed by upstream adding attest-build-provenance — one step, which wasm-tools already has — or by forking wac into pulseengine and releasing it through a signed pipeline."
 [tool.asset-for]
 "aarch64-apple-darwin"      = "wac-cli-aarch64-apple-darwin"
 "x86_64-apple-darwin"       = "wac-cli-x86_64-apple-darwin"
