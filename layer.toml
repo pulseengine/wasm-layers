@@ -40,7 +40,32 @@
 #
 # v0.38.0 makes the state unrepresentable: the signer is an Option, absent
 # means absent, and a blank signer is refused under every mechanism.
-version = "v0.38.0"
+#
+# v0.41.0, and THIS REALM IS WHY AGAIN — twice over, and this time the pin is
+# not optional: v0.38.0 cannot parse this file, and could not deposit it if it
+# could.
+#
+# First, varve refused bytes upstream fully attests (varve#245). The
+# build-provenance rung probed ONE asset of a release and treated that
+# statement's subject list as the release's complete set of covered digests.
+# True for a publisher that batches — wasm-tools v1.260.0 puts ten subjects in
+# one statement. False for one that calls attest-build-provenance per file:
+# wasmtime v49.0.1 publishes one statement per asset, each naming one file, so
+# three of its four assets were refused as unproven while
+# `gh attestation verify` accepted every one of them. Fail-closed, so never a
+# hole — but it stopped this realm depositing at all, and v0.38.0 and v0.40.0
+# fail identically, so there was no older pin to retreat to.
+#
+# Second, `platforms` on a tool does not EXIST before v0.41.0, and the thirteen
+# binaryen entries below need it. v0.38.0 rejects the field outright
+# (`unknown field 'platforms'`) rather than ignoring it — which is the right
+# failure, because ignoring it would widen those entries back to four platforms
+# and rebuild the macOS payloads that cannot work.
+#
+# It also brings the measured libc floor (v0.40.0, REQ-LIBCSTATED-001), so this
+# realm's Linux payloads will finally state the libc they need instead of
+# leaving a consumer to discover it from a loader error.
+version = "v0.41.0"
 
 [realm]
 name    = "pulseengine-wasm"
@@ -166,19 +191,152 @@ asset   = "wasmtime-%R-%U.tar.xz"
 # Apple silicon is `arm64-macos` and not `aarch64-macos`, the one platform
 # whose name %U cannot derive, so that single asset is named outright rather
 # than the whole set being hand-written.
+# binaryen, as THIRTEEN tools and LINUX ONLY. Both halves are deliberate.
+#
+# THIRTEEN, because one `[[tool]]` is one executable and binaryen ships a
+# toolbox: wasm-opt is the one everybody names, but wasm-merge, wasm-metadce
+# and wasm-split are each the only thing that does their job. `binaryen` is a
+# project, not a command, and an entry named after it found nothing in the
+# archive -- the deposit failed with "the archive contains no file named
+# binaryen". `binaryen-unittests` is deliberately NOT carried: it is the
+# project's own test harness, not a tool a consumer runs.
+#
+# LINUX ONLY, because the macOS build cannot be a varve payload at all.
+# Measured 2026-10-07: the Linux wasm-opt is 18.7 MB, statically linked, and
+# references no libbinaryen. The macOS wasm-opt is a 1.7 MB stub that loads a
+# 15 MB @rpath/libbinaryen.dylib from @loader_path/../lib. A varve tool
+# payload is ONE executable with no sibling directory, so a macOS payload
+# would be fetched, verified, signed into the layer, installed and verified
+# again -- every check passing -- and then fail at the first exec.
+#
+# This is NOT "upstream does not build macOS": it does, and we decline to
+# carry it. Saying so with `platforms` rather than by naming an asset that
+# does not exist is varve REQ-TOOLPLAT-001 and DD-038; the alternative would
+# make a 404 enact a policy and leave the reason recorded nowhere. varve
+# refuses to translate this field into the legacy env encoding rather than
+# widening it back.
+#
+# Carrying binaryen on macOS needs either a tool payload that can carry a
+# runtime library beside the executable, or an `sdk` payload reached by path
+# instead of by shim. Neither exists yet.
+
 [[tool]]
-name    = "binaryen"
+name    = "wasm-opt"
 repo    = "WebAssembly/binaryen"
 version = "133"
-unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs wasm-opt."
 release = "version_133"
 asset   = "binaryen-%R-%U.tar.gz"
-[tool.asset-for]
-"aarch64-apple-darwin" = "binaryen-version_133-arm64-macos.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
 
-# The wrpc runtime tool. Same repository as `wit-bindgen-wrpc` above and the
-# same raw-per-platform shape: bare binaries, MUSL on Linux, so the four names
-# are stated rather than guessed.
+[[tool]]
+name    = "wasm-as"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-dis"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-merge"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-metadce"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-reduce"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-shell"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-split"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-ctor-eval"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-emscripten-finalize"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-fuzz-lattices"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm-fuzz-types"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
+[[tool]]
+name    = "wasm2js"
+repo    = "WebAssembly/binaryen"
+version = "133"
+release = "version_133"
+asset   = "binaryen-%R-%U.tar.gz"
+platforms = ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+unverified-reason = "WebAssembly/binaryen version_133 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02, re-measured 2026-10-07: no SHA256SUMS, .sig or .pem on the release, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run). Accepted for the rolling channel only: the tag is immutable and this layer freezes the digest. One release supplies all thirteen of these tools, so this is deliberately the same text for every one of them -- the opt-in is per RELEASE, and thirteen different reasons for one release would mean twelve of them were never checked. Note this is a DIFFERENT organisation from the bytecodealliance tools beside it, so the fork-and-sign route is a larger undertaking here. Removed by upstream adding attest-build-provenance, or by dropping binaryen if no consumer of this realm needs it."
+
 [[tool]]
 name    = "wrpc-wasmtime"
 repo    = "bytecodealliance/wrpc"
