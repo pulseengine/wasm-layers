@@ -65,7 +65,7 @@
 # It also brings the measured libc floor (v0.40.0, REQ-LIBCSTATED-001), so this
 # realm's Linux payloads will finally state the libc they need instead of
 # leaving a consumer to discover it from a loader error.
-version = "v0.41.0"
+version = "v0.42.0"
 
 [realm]
 name    = "pulseengine-wasm"
@@ -185,14 +185,14 @@ exit     = "Removed by upstream adding attest-build-provenance — one step, whi
 [[tool]]
 name    = "wasmtime"
 repo    = "bytecodealliance/wasmtime"
-# 49.0.1, not 49.0.0: upstream 49.0.1 is a SECURITY release fixing
-# GHSA-m63x-6p34-q65x (fuel-spend dropped for callees of `call_ref`
-# and callees returning via exception throws) and GHSA-jqpg-j7w6-42pr
-# (fuel spend for dynamic record lifting). Published 2026-09-24 and
-# unnoticed here until 2026-09-30, because this realm scans only when
-# a person asks it to — see pulseengine/varve#216.
-version = "49.0.1"
-release = "v49.0.1"
+# 49.0.3: a SECURITY release. 49.0.1 — carried until 2026-10-15 — is
+# covered by 23 published advisories (one critical, GHSA-32h6-97mm-8q3c;
+# one high, GHSA-m9f7-9w4p-gv38), eight fixed in 49.0.2 and fifteen in
+# 49.0.3, all stated against layer 2026.10.0 in this realm's line-status.
+# (49.0.1 itself was the security release for GHSA-m63x-6p34-q65x and
+# GHSA-jqpg-j7w6-42pr, noticed six days late — pulseengine/varve#216.)
+version = "49.0.3"
+release = "v49.0.3"
 asset   = "wasmtime-%R-%U.tar.xz"
 
 # wasm-opt and friends. Upstream's version IS the tag's suffix (`version_133`
