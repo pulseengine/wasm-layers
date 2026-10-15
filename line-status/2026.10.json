@@ -5,6 +5,15 @@
   "support-until": "2026-11-08",
   "known-problems": [
     {
+      "id": "GHSA-32h6-97mm-8q3c",
+      "title": "wasmtime 49.0.1: Wasmtime component async-lifted callback result count is unvalidated, causing a native stack buffer overflow (wasmtime; fixed in 49.0.2)",
+      "severity": "critical",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
       "id": "GHSA-m9f7-9w4p-gv38",
       "title": "wasmtime 49.0.1: Filesystem sandbox escape when renaming symlinks with trailing slashes (wasmtime-wasi; fixed in 49.0.3)",
       "severity": "high",
@@ -68,6 +77,24 @@
       "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
     },
     {
+      "id": "GHSA-cfhf-m2cr-62wj",
+      "title": "wasmtime 49.0.1: Mis-typed WebAssembly tag imports can lead to GC heap corruption (wasmtime; fixed in 49.0.2)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-gqmc-89g8-p25r",
+      "title": "wasmtime 49.0.1: Excessive allocated memory on the host when guests don't have stdio (wasmtime-wasi; fixed in 49.0.2)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
       "id": "GHSA-hmwq-g22x-qjw5",
       "title": "wasmtime 49.0.1: Panic when pending calls are run after a trap (wasmtime; fixed in 49.0.3)",
       "severity": "medium",
@@ -77,6 +104,24 @@
       "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
     },
     {
+      "id": "GHSA-hw8m-q44c-ggrf",
+      "title": "wasmtime 49.0.1: Rooting for GC values live across `try_call` may be missing, causing GC heap corruption (wasmtime; fixed in 49.0.2)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-j366-h8gg-77pm",
+      "title": "wasmtime 49.0.1: WASI preview 0 implementation of `poll_oneoff` circumvents fuel consumption (wasmtime-wasi; fixed in 49.0.2)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
       "id": "GHSA-m6w2-jwq2-cv2c",
       "title": "wasmtime 49.0.1: Panic when invoking an async-lifted function via `call` (wasmtime; fixed in 49.0.3)",
       "severity": "medium",
@@ -84,6 +129,15 @@
         "2026.10.0"
       ],
       "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-mr2v-56j5-cmfc",
+      "title": "wasmtime 49.0.1: Guest can panic host through filesystem timestamp before the epoch on wasip3 (wasmtime-wasi; fixed in 49.0.2)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
     },
     {
       "id": "GHSA-q554-3cjc-rx7p",
@@ -113,6 +167,15 @@
       "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
     },
     {
+      "id": "GHSA-w4qr-p94g-mjhv",
+      "title": "wasmtime 49.0.1: Wasmtime wasi:http implementation panics with a zero timeout supplied (wasmtime-wasi-http; fixed in 49.0.2)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
       "id": "GHSA-wjc8-633q-pwxr",
       "title": "wasmtime 49.0.1: Stack overflow dropping a long chain of recursive types (wasmtime; fixed in 49.0.3)",
       "severity": "medium",
@@ -129,6 +192,15 @@
         "2026.10.0"
       ],
       "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-96f6-r43r-8c24",
+      "title": "wasmtime 49.0.1: fd_readdir copies uninitialized struct padding into guest memory (wasmtime-wasi; fixed in 49.0.2)",
+      "severity": "low",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.2 or later fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
     },
     {
       "id": "GHSA-p79w-pv2r-29qp",
