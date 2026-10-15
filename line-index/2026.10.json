@@ -1,0 +1,19 @@
+{
+  "line": "2026.10",
+  "counter": 2,
+  "issued-at": "2026-10-15T12:44:16Z",
+  "layers": [
+    {
+      "layer": "2026.10.0",
+      "digest": "sha256:6728471348f19f23713a463b1e3fc4fd15c44b50e26c4cf6f2ae18f2a101ea35",
+      "channel": "rolling",
+      "counter": 1
+    },
+    {
+      "layer": "2026.10.1",
+      "digest": "sha256:b417e3d3879853a0436d83fb50b8e702a7f6bbfefad564289dbf7f11889cac54",
+      "channel": "rolling",
+      "counter": 2
+    }
+  ]
+}
