@@ -1,0 +1,143 @@
+{
+  "line": "2026.10",
+  "counter": 2,
+  "issued-at": "2026-10-15T05:00:00Z",
+  "support-until": "2026-11-08",
+  "known-problems": [
+    {
+      "id": "GHSA-m9f7-9w4p-gv38",
+      "title": "wasmtime 49.0.1: Filesystem sandbox escape when renaming symlinks with trailing slashes (wasmtime-wasi; fixed in 49.0.3)",
+      "severity": "high",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-3r89-v5mq-j5xf",
+      "title": "wasmtime 49.0.1: Host panic when component `call_async` is cancelled under some conditions (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-54p9-vhhq-8f7q",
+      "title": "wasmtime 49.0.1: Overlapping string transcode in a fused adapter can panic (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-5hhx-4wrr-3j9g",
+      "title": "wasmtime 49.0.1: Yielding in a component start function can lead to a host panic (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-63h4-6cx9-pjfj",
+      "title": "wasmtime 49.0.1: Panic viewing component model stream or future as the wrong type (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-7v24-42x9-pxf7",
+      "title": "wasmtime 49.0.1: Panic on erroneous call-to-host from guest realloc call (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-93g3-36p8-x2gc",
+      "title": "wasmtime 49.0.1: Out-of-bounds zero-length stream writes can panic (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-hmwq-g22x-qjw5",
+      "title": "wasmtime 49.0.1: Panic when pending calls are run after a trap (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-m6w2-jwq2-cv2c",
+      "title": "wasmtime 49.0.1: Panic when invoking an async-lifted function via `call` (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-q554-3cjc-rx7p",
+      "title": "wasmtime 49.0.1: Component-model handle tables are capped only per instance and charged to no limit (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-vcg5-q8m5-8379",
+      "title": "wasmtime 49.0.1: Wasmtime may not properly enforce async-entrypoint requirement (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-w36r-2hch-9xp9",
+      "title": "wasmtime 49.0.1: `wasi-http`: Request with long url before query parameter crashes host (wasmtime-wasi-http; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-wjc8-633q-pwxr",
+      "title": "wasmtime 49.0.1: Stack overflow dropping a long chain of recursive types (wasmtime; fixed in 49.0.3)",
+      "severity": "medium",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-5qpp-g3j2-8frx",
+      "title": "wasmtime 49.0.1: Guests can send absolute-form HTTP requests to different hosts (wasmtime-wasi-http; fixed in 49.0.3)",
+      "severity": "low",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    },
+    {
+      "id": "GHSA-p79w-pv2r-29qp",
+      "title": "wasmtime 49.0.1: Exception tags can cause host data structures to be unaligned (wasmtime; fixed in 49.0.3)",
+      "severity": "low",
+      "affected": [
+        "2026.10.0"
+      ],
+      "workaround": "None inside this layer. wasmtime 49.0.3 fixes it; move to the wasm-layers layer that carries 49.0.3 once it is published."
+    }
+  ]
+}
