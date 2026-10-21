@@ -84,7 +84,7 @@ registry = "oci://ghcr.io/pulseengine/wasm-layers"
 [[tool]]
 name    = "wasm-tools"
 repo    = "bytecodealliance/wasm-tools"
-version = "v1.260.0"
+version = "v1.262.0"
 asset   = "wasm-tools-%V-%U.tar.gz"
 
 # A bare binary per platform, and the file is called `wac-cli` while the tool
@@ -169,10 +169,10 @@ exit     = "Removed by upstream adding attest-build-provenance, or by forking wr
 [[tool]]
 name    = "wit-bindgen"
 repo    = "bytecodealliance/wit-bindgen"
-version = "v0.62.0"
+version = "v0.63.0"
 asset   = "wit-bindgen-%V-%U.tar.gz"
 [tool.unverified]
-measured = "bytecodealliance/wit-bindgen v0.62.0 publishes neither cosign-signed sums nor build provenance (measured 2026-10-02: the release carries no SHA256SUMS, .sig or .pem, and `gh attestation verify` returns 404 for its assets, while the identical probe exits 0 for wasmtime v49.0.1 and wasm-tools v1.260.0 in the same run)."
+measured = "bytecodealliance/wit-bindgen v0.63.0 publishes no proof of origin this assembler accepts (measured 2026-10-21: the release carries no SHA256SUMS.txt and no cosign bundle, and no build provenance covering its assets)."
 accepted = "Accepted for the rolling channel only: the tag is immutable, this layer freezes the digest, and generating bindings is the one step of the component-model toolchain nothing else performs."
 exit     = "Removed by upstream adding attest-build-provenance — one step, which its sibling wasm-tools already has — or by forking wit-bindgen into pulseengine and releasing it through a signed pipeline."
 
@@ -191,8 +191,8 @@ repo    = "bytecodealliance/wasmtime"
 # 49.0.3, all stated against layer 2026.10.0 in this realm's line-status.
 # (49.0.1 itself was the security release for GHSA-m63x-6p34-q65x and
 # GHSA-jqpg-j7w6-42pr, noticed six days late — pulseengine/varve#216.)
-version = "49.0.3"
-release = "v49.0.3"
+version = "50.0.0"
+release = "v50.0.0"
 asset   = "wasmtime-%R-%U.tar.xz"
 
 # wasm-opt and friends. Upstream's version IS the tag's suffix (`version_133`
