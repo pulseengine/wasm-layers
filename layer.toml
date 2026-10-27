@@ -65,7 +65,15 @@
 # It also brings the measured libc floor (v0.40.0, REQ-LIBCSTATED-001), so this
 # realm's Linux payloads will finally state the libc they need instead of
 # leaving a consumer to discover it from a loader error.
-version = "v0.42.0"
+#
+# v0.43.0, not v0.42.0: the SBOM a deposit attaches now names each payload's
+# supplier and license and links the upstream's own SBOM, each from a signed
+# statement (varve REQ-SBOMFIELDS-001), so a consumer can answer "who made this
+# and under what license" from the layer alone. And `varve-producer advisories`
+# exists only from v0.43.0: the scheduled advisory watch planned for this realm
+# (varve REQ-ADVISORYWATCH-002) runs it. Measured 2026-10-27: the v0.43.0
+# `plan` accepts this file unchanged.
+version = "v0.43.0"
 
 [realm]
 name    = "pulseengine-wasm"
