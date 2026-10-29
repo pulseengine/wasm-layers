@@ -199,8 +199,8 @@ repo    = "bytecodealliance/wasmtime"
 # 49.0.3, all stated against layer 2026.10.0 in this realm's line-status.
 # (49.0.1 itself was the security release for GHSA-m63x-6p34-q65x and
 # GHSA-jqpg-j7w6-42pr, noticed six days late — pulseengine/varve#216.)
-version = "50.0.0"
-release = "v50.0.0"
+version = "50.0.1"
+release = "v50.0.1"
 asset   = "wasmtime-%R-%U.tar.xz"
 
 # wasm-opt and friends. Upstream's version IS the tag's suffix (`version_133`
