@@ -92,7 +92,7 @@ registry = "oci://ghcr.io/pulseengine/wasm-layers"
 [[tool]]
 name    = "wasm-tools"
 repo    = "bytecodealliance/wasm-tools"
-version = "v1.262.0"
+version = "v1.263.0"
 asset   = "wasm-tools-%V-%U.tar.gz"
 
 # A bare binary per platform, and the file is called `wac-cli` while the tool
