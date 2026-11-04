@@ -1,0 +1,13 @@
+{
+  "line": "2026.11",
+  "counter": 1,
+  "issued-at": "2026-11-04T04:52:26Z",
+  "layers": [
+    {
+      "layer": "2026.11.0",
+      "digest": "sha256:b28adbce7c51d155064017f59098d1b73edaf6ffceb828ddcb44afac34fb8984",
+      "channel": "rolling",
+      "counter": 1
+    }
+  ]
+}
