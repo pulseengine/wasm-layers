@@ -36,13 +36,12 @@ on:
         type: string
 
 permissions:
-  # `contents` and `pull-requests` to PROPOSE the updated line index as a
-  # signed pull request: this repository's main requires both a PR and signed
-  # commits, so the deposit cannot push the index itself. Merging it is what
-  # publishes it (publish-line-index.yml). The committed document is the
-  # artifact of record (varve DD-027).
-  contents: write
-  pull-requests: write
+  # github.token needs only to read the checkout and push to ghcr. Proposing
+  # the line index as a signed pull request uses the App token minted in the
+  # propose step, so that `check` runs on that PR. This repository's main
+  # requires a PR and signed commits, so the deposit cannot push the index
+  # itself; merging the PR publishes it (publish-line-index.yml, varve DD-027).
+  contents: read
   packages: write
 
 jobs:
@@ -434,10 +433,27 @@ jobs:
       # pin against it, and `covalent-layers` — which composes this realm by
       # digest — could not be told its include had moved. Ported from
       # pulseengine-layers, which has published one since 2026-10-01.
+      # The App token, not github.token. A PR opened with the default token
+      # starts no `check` run (a run with zero jobs), so `check` could never be
+      # required. The token is scoped to this repository (the action's default
+      # when no owner or repositories are given) and to the two permissions
+      # opening a PR needs. No continue-on-error: if the mint fails, so does
+      # the job. `app-id` is deprecated for `client-id`, but the secret holds
+      # the app id, so the two must change together (see relay's
+      # pr-branch-keeper.yml).
+      - name: Mint the App token
+        id: apptoken
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        with:
+          app-id: ${{ secrets.ACTIONS_BOT_APP_ID }}
+          private-key: ${{ secrets.ACTIONS_BOT_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Propose this layer for the line index, as a signed pull request
         env:
           VARVE_WASM_KEY: ${{ secrets.VARVE_WASM_KEY }}
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.apptoken.outputs.token }}
           LAYER: ${{ inputs.layer }}
           COUNTER: ${{ inputs.counter }}
           CHANNEL: ${{ steps.pins.outputs.channel }}
@@ -471,7 +487,7 @@ jobs:
           # PROPOSE, never push. main requires a pull request AND signed
           # commits; pushing the index straight to main is what failed the
           # 2026.10.1 deposit (GH013) after its layer was already published.
-          # createCommitOnBranch with the workflow token yields a commit GitHub
+          # createCommitOnBranch with the App token yields a commit GitHub
           # signs — checked below, not assumed. Merging the PR publishes the
           # signed index (publish-line-index.yml).
           BRANCH="line-index/$LAYER"
