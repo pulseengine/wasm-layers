@@ -152,11 +152,11 @@ exit     = "Removed by upstream adding attest-build-provenance — one step, whi
 [[tool]]
 name    = "wkg"
 repo    = "bytecodealliance/wasm-pkg-tools"
-version = "v0.16.1"
+version = "v0.16.2"
 layout  = "raw-per-platform"
 asset   = "wkg-%T"
 [tool.unverified]
-measured = "bytecodealliance/wasm-pkg-tools v0.16.1 publishes neither cosign-signed sums nor build provenance (measured 2026-09-18)."
+measured = "bytecodealliance/wasm-pkg-tools v0.16.2 publishes no proof of origin this assembler accepts (measured 2026-11-14: the release carries no SHA256SUMS.txt and no cosign bundle, and no build provenance covering its assets)."
 accepted = "Accepted for the rolling channel only, on the same terms as wac: an immutable tag and a digest this layer freezes, with no signature over the bytes."
 exit     = "Removed by upstream adding attest-build-provenance, or by forking into pulseengine."
 
