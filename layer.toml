@@ -427,3 +427,26 @@ exit     = "Removed by upstream adding attest-build-provenance, or by forking wr
 "x86_64-apple-darwin"       = "wrpc-wasmtime-x86_64-apple-darwin"
 "aarch64-unknown-linux-gnu" = "wrpc-wasmtime-aarch64-unknown-linux-musl"
 "x86_64-unknown-linux-gnu"  = "wrpc-wasmtime-x86_64-unknown-linux-musl"
+
+# w2c2 translates a WebAssembly module to C (wasm -> C). Upstream
+# turbolent/w2c2 publishes no releases, so it is carried through the signed
+# fork pulseengine/w2c2: tag v<YYYY.MM.DD>-<sha7> names the upstream commit,
+# and the fork's release guard refuses a tag whose tree differs from that
+# commit outside .github/. v2026.11.11-bc3fd9a builds turbolent/w2c2@bc3fd9a;
+# its SHA256SUMS.txt is cosign-signed by release.yml@refs/tags/v2026.11.11-bc3fd9a
+# and every archive has build provenance. Linux takes the static musl archives,
+# keyed by the gnu triple (varve#175). No x86_64-apple-darwin build.
+#
+# Only the binary is carried. The archive also holds include/w2c2_base.h,
+# which every generated C file includes, and the WASI runtime sources; a
+# layer cannot carry a file tree beside a tool until the toolchain payload
+# kind lands (varve#218). Until then take the header from the same release.
+# w2c2 has no --version flag.
+[[tool]]
+name      = "w2c2"
+repo      = "pulseengine/w2c2"
+version   = "v2026.11.11-bc3fd9a"
+platforms = ["aarch64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-unknown-linux-gnu"]
+[tool.asset-for]
+"x86_64-unknown-linux-gnu"  = "w2c2-%R-x86_64-unknown-linux-musl.tar.gz"
+"aarch64-unknown-linux-gnu" = "w2c2-%R-aarch64-unknown-linux-musl.tar.gz"
